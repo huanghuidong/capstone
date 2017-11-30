@@ -35,11 +35,11 @@ def maybe_download_and_extract():
     :return: nothing
     '''
     dest_directory = data_dir
-    if not os.path.exists(dest_directory):
+    if not os.path.exists(dest_directory):			#To judge whether dest_dicrectory existed
         os.makedirs(dest_directory)
-    filename = DATA_URL.split('/')[-1]
-    filepath = os.path.join(dest_directory, filename)
-    if not os.path.exists(filepath):
+    filename = DATA_URL.split('/')[-1] 					#To split out filename like "data_batch_1","data_batch_1"...
+    filepath = os.path.join(dest_directory, filename) 		
+    if not os.path.exists(filepath):						#To judge whether file already existed in the dest_directory
         def _progress(count, block_size, total_size):
             sys.stdout.write('\r>> Downloading %s %.1f%%' % (filename, float(count * block_size)
                                                              / float(total_size) * 100.0))
@@ -64,12 +64,12 @@ def _read_one_batch(path, is_random_label):
 #    fo = open(path, 'rb')
 #    dicts = cPickle.load(fo)
 #    fo.close()
-    with open(path, 'rb') as fo:
-        dicts = pickle.load(fo, encoding='latin1')         #it use latin as encoding rule
+    with open(path, 'rb') as fo:											#Each time, it onlye read one file including 6000 image data
+        dicts = pickle.load(fo, encoding='latin1') 		#It use latin as encoding rule  
 #    print (dicts)
-    data = dicts.get('data')
+    data = dicts.get('data')													#Following the key "data", there are real image data
 #    print (data)
-    if is_random_label is False:
+    if is_random_label is False:											#If is_random_label is true, it will generate 10000 random labels ,why?
         label = np.array(dicts['labels'])
     else:
         labels = np.random.randint(low=0, high=10, size=10000)
@@ -86,10 +86,10 @@ def read_in_all_images(address_list, shuffle=True, is_random_label = False):
     :return: concatenated numpy array of data and labels. Data are in 4D arrays: [num_images,
     image_height, image_width, image_depth] and labels are in 1D arrays: [num_images]
     """
-    data = np.array([]).reshape([0, IMG_WIDTH * IMG_HEIGHT * IMG_DEPTH])
+    data = np.array([]).reshape([0, IMG_WIDTH * IMG_HEIGHT * IMG_DEPTH])		#Declare array, format like [ batch_num, image data]
     label = np.array([])
 
-    for address in address_list:
+    for address in address_list:									#Read all files in address_list, then merge all image data into one single dataarray 
         print ('Reading images from ' + address)
         batch_data, batch_label = _read_one_batch(address, is_random_label)
         # Concatenate along axis 0 by default
@@ -123,7 +123,7 @@ def horizontal_flip(image, axis):
     '''
     flip_prop = np.random.randint(low=0, high=2)
     if flip_prop == 0:
-        image = cv2.flip(image, axis)
+        image = cv2.flip(image, axis)				
 
     return image
 
@@ -134,8 +134,8 @@ def whitening_image(image_np):
     :param image_np: a 4D numpy array representing a batch of images
     :return: the image numpy array after whitened
     '''
-    for i in range(len(image_np)):
-        mean = np.mean(image_np[i, ...])
+    for i in range(len(image_np)):					
+        mean = np.mean(image_np[i, ...])			#If there are five images, it will make whitened one by one 
         # Use adjusted standard deviation here, in case the std == 0.
         std = np.max([np.std(image_np[i, ...]), 1.0/np.sqrt(IMG_HEIGHT * IMG_WIDTH * IMG_DEPTH)])
         image_np[i,...] = (image_np[i, ...] - mean) / std
@@ -152,7 +152,7 @@ def random_crop_and_flip(batch_data, padding_size):
     cropped_batch = np.zeros(len(batch_data) * IMG_HEIGHT * IMG_WIDTH * IMG_DEPTH).reshape(
         len(batch_data), IMG_HEIGHT, IMG_WIDTH, IMG_DEPTH)
 
-    for i in range(len(batch_data)):
+    for i in range(len(batch_data)):				#Use batch_num( len(batch_data) ) to iterate the images
         x_offset = np.random.randint(low=0, high=2 * padding_size, size=1)[0]
         y_offset = np.random.randint(low=0, high=2 * padding_size, size=1)[0]
         cropped_batch[i, ...] = batch_data[i, ...][x_offset:x_offset+IMG_HEIGHT,
@@ -171,7 +171,7 @@ def prepare_train_data(padding_size):
     :return: all the train data and corresponding labels
     '''
     path_list = []
-    for i in range(1, NUM_TRAIN_BATCH+1):
+    for i in range(1, NUM_TRAIN_BATCH+1):						#To generate file list like \cifar10_data\data_batch_1,\cifar10_data\data_batch_2,
         path_list.append(full_data_dir + str(i))
     data, label = read_in_all_images(path_list, is_random_label=TRAIN_RANDOM_LABEL)
     
