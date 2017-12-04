@@ -5,9 +5,11 @@ import tarfile
 from six.moves import urllib
 import sys
 import numpy as np
-import cPickle
+#import cPickle
+import pickle
 import os
 import cv2
+
 
 data_dir = 'cifar10_data'
 full_data_dir = 'cifar10_data/cifar-10-batches-py/data_batch_'
@@ -59,11 +61,14 @@ def _read_one_batch(path, is_random_label):
     :param is_random_label: do you want to use random labels?
     :return: image numpy arrays and label numpy arrays
     '''
-    fo = open(path, 'rb')
-    dicts = cPickle.load(fo)
-    fo.close()
-
-    data = dicts['data']
+#    fo = open(path, 'rb')
+#    dicts = cPickle.load(fo)
+#    fo.close()
+    with open(path, 'rb') as fo:
+        dicts = pickle.load(fo, encoding='latin1')         #it use latin as encoding rule
+#    print (dicts)
+    data = dicts.get('data')
+#    print (data)
     if is_random_label is False:
         label = np.array(dicts['labels'])
     else:
@@ -85,7 +90,7 @@ def read_in_all_images(address_list, shuffle=True, is_random_label = False):
     label = np.array([])
 
     for address in address_list:
-        print £¨'Reading images from ' + address£©
+        print ('Reading images from ' + address)
         batch_data, batch_label = _read_one_batch(address, is_random_label)
         # Concatenate along axis 0 by default
         data = np.concatenate((data, batch_data))
@@ -100,7 +105,7 @@ def read_in_all_images(address_list, shuffle=True, is_random_label = False):
 
 
     if shuffle is True:
-        print £¨'Shuffling'£©
+        print ('Shuffling')
         order = np.random.permutation(num_data)
         data = data[order, ...]
         label = label[order]
@@ -167,11 +172,11 @@ def prepare_train_data(padding_size):
     '''
     path_list = []
     for i in range(1, NUM_TRAIN_BATCH+1):
-        path_list.append(full_data_dir + str(i))
+        path_list.append(full_data_dir + str(i))																							#full_data_dir = 'cifar10_data/cifar-10-batches-py/data_batch_'
     data, label = read_in_all_images(path_list, is_random_label=TRAIN_RANDOM_LABEL)
     
-    pad_width = ((0, 0), (padding_size, padding_size), (padding_size, padding_size), (0, 0))
-    data = np.pad(data, pad_width=pad_width, mode='constant', constant_values=0)
+    pad_width = ((0, 0), (padding_size, padding_size), (padding_size, padding_size), (0, 0))	# padding_size=2
+    data = np.pad(data, pad_width=pad_width, mode='constant', constant_values=0)							# add multiple 0(pad_width)  to data array, extend in axis=0 and axis=1
     
     return data, label
 
@@ -186,5 +191,11 @@ def read_validation_data():
     validation_array = whitening_image(validation_array)
 
     return validation_array, validation_labels
+
+def unpickle(file):
+    import pickle
+    with open(file, 'rb') as fo:
+        dict = pickle.load(fo, encoding='bytes')
+    return dict
 
 

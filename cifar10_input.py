@@ -41,8 +41,7 @@ def maybe_download_and_extract():
     filepath = os.path.join(dest_directory, filename)
     if not os.path.exists(filepath):
         def _progress(count, block_size, total_size):
-            sys.stdout.write('\r>> Downloading %s %.1f%%' % (filename, float(count * block_size)
-                                                             / float(total_size) * 100.0))
+            sys.stdout.write('\r>> Downloading %s %.1f%%' % (filename, float(count * block_size) / float(total_size) * 100.0))
             sys.stdout.flush()
         filepath, _ = urllib.request.urlretrieve(DATA_URL, filepath, _progress)
         print()
@@ -172,11 +171,11 @@ def prepare_train_data(padding_size):
     '''
     path_list = []
     for i in range(1, NUM_TRAIN_BATCH+1):
-        path_list.append(full_data_dir + str(i))
+        path_list.append(full_data_dir + str(i))																							#full_data_dir = 'cifar10_data/cifar-10-batches-py/data_batch_'
     data, label = read_in_all_images(path_list, is_random_label=TRAIN_RANDOM_LABEL)
     
-    pad_width = ((0, 0), (padding_size, padding_size), (padding_size, padding_size), (0, 0))
-    data = np.pad(data, pad_width=pad_width, mode='constant', constant_values=0)
+    pad_width = ((0, 0), (padding_size, padding_size), (padding_size, padding_size), (0, 0))	# padding_size=2
+    data = np.pad(data, pad_width=pad_width, mode='constant', constant_values=0)							# add multiple 0(pad_width)  to data array, extend in axis=0 and axis=1
     
     return data, label
 

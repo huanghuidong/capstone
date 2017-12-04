@@ -115,7 +115,7 @@ class Train(object):
         print 'Start training...'
         print '----------------------------'
 
-        for step in xrange(FLAGS.train_steps):				#train_steps= 80000, train 80000 times, each time get one batch from all data.
+        for step in xrange(FLAGS.train_steps):				#train_steps= 80000, train 8000 times, each time get one batch from all data.
 
             train_batch_data, train_batch_labels = self.generate_augment_train_batch(all_data, all_labels, FLAGS.train_batch_size)	#input all_data,  get a batch
 
@@ -152,7 +152,7 @@ class Train(object):
 
             start_time = time.time()
 
-            _, _, train_loss_value, train_error_value = sess.run([self.train_op, self.train_ema_op,				#train a batch 
+            _, _, train_loss_value, train_error_value = sess.run([self.train_op, self.train_ema_op,
                                                            self.full_loss, self.train_top1_error],
                                 {self.image_placeholder: train_batch_data,
                                   self.label_placeholder: train_batch_labels,
