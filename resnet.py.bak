@@ -166,7 +166,7 @@ def inference(input_tensor_batch, n, reuse):
 
     layers = []
     with tf.variable_scope('conv0', reuse=reuse):
-        conv0 = conv_bn_relu_layer(input_tensor_batch, [3, 3, 3, 16], 1)   # filter =[3,3,3,16] 
+        conv0 = conv_bn_relu_layer(input_tensor_batch, [3, 3, 3, 16], 1)
         activation_summary(conv0)
         layers.append(conv0)
 
