@@ -171,11 +171,11 @@ def prepare_train_data(padding_size):
     '''
     path_list = []
     for i in range(1, NUM_TRAIN_BATCH+1):
-        path_list.append(full_data_dir + str(i))																							#full_data_dir = 'cifar10_data/cifar-10-batches-py/data_batch_'
+        path_list.append(full_data_dir + str(i))												#full_data_dir = 'cifar10_data/cifar-10-batches-py/data_batch_'
     data, label = read_in_all_images(path_list, is_random_label=TRAIN_RANDOM_LABEL)
     
     pad_width = ((0, 0), (padding_size, padding_size), (padding_size, padding_size), (0, 0))	# padding_size=2
-    data = np.pad(data, pad_width=pad_width, mode='constant', constant_values=0)							# add multiple 0(pad_width)  to data array, extend in axis=0 and axis=1
+    data = np.pad(data, pad_width=pad_width, mode='constant', constant_values=0)				# add multiple 0(pad_width)  to data array, extend in axis=0 and axis=1
     
     return data, label
 
